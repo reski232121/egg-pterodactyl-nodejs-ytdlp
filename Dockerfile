@@ -31,6 +31,7 @@ RUN apt-get update \
         libssl-dev \
         libffi-dev \
         pkg-config \
+        tini \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir --break-system-packages yt-dlp
