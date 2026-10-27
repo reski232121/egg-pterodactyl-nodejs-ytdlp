@@ -7,6 +7,7 @@ LABEL org.opencontainers.image.source="https://github.com/reski232121/egg-pterod
 LABEL org.opencontainers.image.licenses=MIT
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV NODE_VERSION=${NODE_VERSION}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
