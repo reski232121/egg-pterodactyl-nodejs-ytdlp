@@ -1,24 +1,23 @@
 #!/bin/bash
+cd /home/container
 
-TZ=${TZ:-UTC}
-export TZ
-
+# Make internal Docker IP available to processes.
 INTERNAL_IP=$(ip route get 1 | awk '{print $(NF-2);exit}')
 export INTERNAL_IP
 
-cd /home/container || exit 1
+# Print Node.js version
+printf "\033[1m\033[33mcontainer@pterodactyl~ \033[0mnode -v\n"
+node -v
 
-echo "Node.js Version: $(node -v)"
-echo "npm Version: $(npm -v)"
-echo "FFmpeg Version: $(ffmpeg -version | head -n 1)"
-echo "yt-dlp Version: $(yt-dlp --version)"
-echo "Python3 Version: $(python3 --version)"
-echo ""
+# Check if node_modules exist, if not run npm install
+if [ ! -d "node_modules" ]; then
+    printf "\033[1m\033[33mcontainer@pterodactyl~ \033[0mnpm install\n"
+    npm install --prefer-offline --no-audit
+fi
 
-PARSED=$(echo "${STARTUP}" | sed -e 's/{{/${/g' -e 's/}}/}/g' | eval echo "$(cat -)")
+# Replace Startup Variables
+MODIFIED_STARTUP=$(echo -e ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g')
+echo "$(date '+%Y-%m-%d %H:%M:%S') : Starting server with command: $MODIFIED_STARTUP"
 
-echo "Starting server with command:"
-echo "$PARSED"
-echo ""
-
-exec /bin/bash -c "$PARSED"
+# Run the Server
+eval ${MODIFIED_STARTUP}
