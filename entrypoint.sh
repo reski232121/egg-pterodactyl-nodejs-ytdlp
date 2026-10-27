@@ -21,4 +21,4 @@ echo "Starting server with command:"
 echo "$PARSED"
 echo ""
 
-exec /bin/bash -c "${PARSED}"
+exec /bin/bash -c "$PARSED"
