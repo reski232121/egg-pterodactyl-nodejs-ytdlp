@@ -2,8 +2,8 @@ ARG NODE_VERSION=24
 
 FROM --platform=$TARGETOS/$TARGETARCH node:${NODE_VERSION}-bookworm-slim
 
-LABEL author="Ryuzetsu" maintainer="ryuzetsu342@gmail.com"
-LABEL org.opencontainers.image.source="https://github.com/reski232121/egg-pterodactyl-nodejs-ytdlp"
+LABEL author="Ryuzetsu" maintainer="custom@pterodactyl.io"
+LABEL org.opencontainers.image.source="https://github.com/yourusername/pterodactyl-nodejs-ytdlp"
 LABEL org.opencontainers.image.licenses=MIT
 
 ENV DEBIAN_FRONTEND=noninteractive
