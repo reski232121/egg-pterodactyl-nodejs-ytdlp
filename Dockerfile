@@ -1,8 +1,8 @@
 ARG NODE_VERSION=20
 
-FROM --platform=$TARGETOS/$TARGETARCH node:${NODE_VERSION}-bullseye-slim
+FROM --platform=$TARGETOS/$TARGETARCH node:${NODE_VERSION}-bookworm-slim
 
-LABEL author="Ryuzetsu" maintainer="reski232121@gmail.com"
+LABEL author="Ryuzetsu" maintainer="ryuzetsu342@gmail.com"
 LABEL org.opencontainers.image.source="https://github.com/reski232121/egg-pterodactyl-nodejs-ytdlp"
 LABEL org.opencontainers.image.licenses=MIT
 
