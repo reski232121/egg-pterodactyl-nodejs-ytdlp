@@ -7,7 +7,6 @@ LABEL org.opencontainers.image.source="https://github.com/reski232121/egg-pterod
 LABEL org.opencontainers.image.licenses=MIT
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV NODE_VERSION=${NODE_VERSION}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -35,14 +34,16 @@ RUN apt-get update \
         tini \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir --break-system-packages yt-dlp
+# yt-dlp[default] membawa yt-dlp-ejs (dibutuhkan YouTube); Node.js dipakai sebagai JS runtime
+RUN pip3 install --no-cache-dir --break-system-packages "yt-dlp[default]" \
+    && printf -- '--js-runtimes node\n' > /etc/yt-dlp.conf
 
 RUN npm install --global typescript ts-node @types/node tsx
 
 RUN useradd -m -d /home/container container
 
 USER container
-ENV USER=container HOME=/home/container
+ENV USER=container HOME=/home/container PATH=/home/container/.local/bin:$PATH
 WORKDIR /home/container
 
 COPY --chown=container:container ./entrypoint.sh /entrypoint.sh
