@@ -1,0 +1,269 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-10-30T00:00:00+00:00",
+    "name": "Node.js + yt-dlp + FFmpeg",
+    "author": "ryuzetsu342@gmail.com",
+    "description": "Node.js (22/24/26) dengan yt-dlp, FFmpeg, Python3, npm/pnpm/yarn/bun, TypeScript, Git, dan Cloudflare Tunnel (cloudflared). Cocok untuk bot Discord musik, media downloader, dan web app.",
+    "features": null,
+    "docker_images": {
+        "Node.js 26": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-26",
+        "Node.js 24 (LTS)": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-24",
+        "Node.js 22 (LTS)": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-22",
+        "Node.js 25 (EOL, build manual)": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-25",
+        "Node.js 23 (EOL, build manual)": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-23",
+        "Node.js 21 (EOL, build manual)": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-21",
+        "Node.js 20 (EOL, build manual)": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-20",
+        "Node.js 18 (EOL, build manual)": "ghcr.io/reski232121/egg-pterodactyl-nodejs-ytdlp:node-18"
+    },
+    "file_denylist": [],
+    "startup": "start-app",
+    "config": {
+        "files": "{}",
+        "startup": "{\n    \"done\": [\n        \"listening\",\n        \"ready\",\n        \"started\",\n        \"online\",\n        \"logged in\"\n    ]\n}",
+        "logs": "{}",
+        "stop": "^^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\n# Node.js + yt-dlp installation script\napt update\napt -y --no-install-recommends install git curl ca-certificates unzip tar\n\nmkdir -p /mnt/server\ncd /mnt/server\n\nif [ \"${USER_UPLOAD}\" == \"true\" ] || [ \"${USER_UPLOAD}\" == \"1\" ]; then\n    echo -e \"Assuming user knows what they are doing, skipping git clone.\"\n    exit 0\nfi\n\nif [ -d .git ]; then\n    echo \"Repository sudah ada, melewati clone.\"\n    exit 0\nfi\n\nif [ ! -z \"${GIT_ADDRESS}\" ]; then\n    if [[ ${GIT_ADDRESS} != *.git ]]; then\n        GIT_ADDRESS=${GIT_ADDRESS}.git\n    fi\n\n    if [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\n        echo -e \"Menggunakan anonymous clone.\"\n    else\n        GIT_ADDRESS=\"https://${USERNAME}:${ACCESS_TOKEN}@$(echo -e ${GIT_ADDRESS} | cut -d/ -f3-)\"\n    fi\n\n    if [ -z \"${BRANCH}\" ]; then\n        git clone ${GIT_ADDRESS} .\n    else\n        git clone --single-branch --branch ${BRANCH} ${GIT_ADDRESS} .\n    fi\nfi\n\necho -e \"Instalasi selesai.\"\nexit 0\n",
+            "container": "ghcr.io/parkervcp/installers:debian",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Git Repo Address",
+            "description": "URL repo GitHub (kosongkan jika upload manual).",
+            "env_variable": "GIT_ADDRESS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Install Branch",
+            "description": "Branch yang di-clone.",
+            "env_variable": "BRANCH",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Username",
+            "description": "Username Git (untuk repo private).",
+            "env_variable": "USERNAME",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Git Access Token",
+            "description": "Personal access token (untuk repo private).",
+            "env_variable": "ACCESS_TOKEN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "User Uploaded Files",
+            "description": "Isi 1 jika file di-upload sendiri (lewati git clone saat instalasi).",
+            "env_variable": "USER_UPLOAD",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "Auto Update",
+            "description": "Isi 1 untuk git pull setiap server start.",
+            "env_variable": "AUTO_UPDATE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "Main File",
+            "description": "File yang dijalankan (mis. index.js atau src/index.ts). Kosongkan untuk deteksi otomatis: script 'start' di package.json, lalu field 'main', lalu index.js/index.ts/src/index.*.",
+            "env_variable": "MAIN_FILE",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:100",
+            "field_type": "text"
+        },
+        {
+            "name": "Run Mode",
+            "description": "auto = deteksi otomatis, start = paksa script 'start' package.json, dev = mode watch (node --watch / script 'dev').",
+            "env_variable": "RUN_MODE",
+            "default_value": "auto",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:auto,start,dev",
+            "field_type": "text"
+        },
+        {
+            "name": "Package Manager",
+            "description": "Untuk install dependencies dan paket tambahan: npm, pnpm, yarn, atau bun.",
+            "env_variable": "PACKAGE_MANAGER",
+            "default_value": "npm",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:npm,pnpm,yarn,bun",
+            "field_type": "text"
+        },
+        {
+            "name": "TypeScript Runner",
+            "description": "Untuk file .ts: tsx (paling kompatibel) atau node (TypeScript bawaan Node, butuh Node 22.18+).",
+            "env_variable": "TS_RUNNER",
+            "default_value": "tsx",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:tsx,node",
+            "field_type": "text"
+        },
+        {
+            "name": "Node Environment",
+            "description": "Nilai NODE_ENV. 'production' membuat npm/pnpm melewati devDependencies; tambahkan --include=dev di Install Flags jika dibutuhkan.",
+            "env_variable": "NODE_ENV",
+            "default_value": "production",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:production,development,test",
+            "field_type": "text"
+        },
+        {
+            "name": "Timezone",
+            "description": "Zona waktu, mis. Asia/Jakarta.",
+            "env_variable": "TZ",
+            "default_value": "UTC",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:64",
+            "field_type": "text"
+        },
+        {
+            "name": "Node Options",
+            "description": "Flag Node.js tambahan lewat NODE_OPTIONS, mis. --enable-source-maps.",
+            "env_variable": "NODE_OPTIONS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Auto Memory Limit",
+            "description": "Isi 1 untuk mengatur --max-old-space-size otomatis (85% dari RAM server) agar server tidak di-OOM kill.",
+            "env_variable": "AUTO_MEMORY_LIMIT",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "Install Flags",
+            "description": "Flag tambahan untuk install dependencies, mis. --ignore-scripts atau --include=dev.",
+            "env_variable": "INSTALL_FLAGS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "App Arguments",
+            "description": "Argumen yang diteruskan ke aplikasi.",
+            "env_variable": "NODE_ARGS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Additional Node Packages",
+            "description": "Paket tambahan yang dipasang saat start, dipisah spasi.",
+            "env_variable": "NODE_PACKAGES",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Uninstall Node Packages",
+            "description": "Paket yang dihapus saat start, dipisah spasi.",
+            "env_variable": "UNNODE_PACKAGES",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Auto Update yt-dlp",
+            "description": "Isi 1 untuk update yt-dlp setiap server start.",
+            "env_variable": "AUTO_UPDATE_YTDLP",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "yt-dlp Channel",
+            "description": "stable (rilis resmi) atau nightly (perbaikan ekstraktor lebih cepat).",
+            "env_variable": "YTDLP_CHANNEL",
+            "default_value": "stable",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:stable,nightly",
+            "field_type": "text"
+        },
+        {
+            "name": "yt-dlp Cookies File",
+            "description": "Path file cookies (format Netscape) relatif terhadap /home/container, mis. cookies.txt. Kosongkan jika tidak dipakai.",
+            "env_variable": "YTDLP_COOKIES",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:200",
+            "field_type": "text"
+        },
+        {
+            "name": "Cloudflare Tunnel Token",
+            "description": "Token Cloudflare Tunnel (diawali eyJ...). Jika diisi, tunnel dijalankan otomatis saat server start. Atur hostname dan service (mis. http://localhost:PORT_SERVER) di dashboard Cloudflare Zero Trust. Kosongkan untuk menonaktifkan.",
+            "env_variable": "CLOUDFLARE_TUNNEL_TOKEN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:2000",
+            "field_type": "text"
+        },
+        {
+            "name": "Cloudflare Tunnel Protocol",
+            "description": "auto (default), quic, atau http2. Pakai http2 jika jaringan host memblokir UDP/QUIC.",
+            "env_variable": "CLOUDFLARE_TUNNEL_PROTOCOL",
+            "default_value": "auto",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:auto,quic,http2",
+            "field_type": "text"
+        }
+    ]
+}
