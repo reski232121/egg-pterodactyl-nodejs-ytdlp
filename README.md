@@ -110,7 +110,6 @@ Catatan:
 
 ## CI/CD dan keamanan
 
-- **Smoke test** (`scripts/smoke-test.sh`) sebelum push: versi Node, yt-dlp/ffmpeg/cloudflared/pnpm/yarn/bun/tsx, curl-cffi, tunnel (token palsu: harus mencoba start dan tidak bocor ke aplikasi), build tools, entrypoint, dan `start-app`. Image yang gagal test tidak dipush.
 - **Rebuild mingguan** (Senin 03:00 UTC) untuk patch Debian, Node.js, dan yt-dlp terbaru.
 - **Trivy**: laporan CVE CRITICAL/HIGH di log build (tidak memblokir).
 - **Provenance + SBOM** diaktifkan pada image yang dipush.
@@ -121,7 +120,6 @@ Catatan:
     --certificate-identity-regexp 'https://github.com/<username>/<repo>/.*' \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com
   ```
-- **Dependabot** menjaga versi GitHub Actions.
 
 ## Contoh konfigurasi
 
@@ -135,7 +133,6 @@ kosongkan `MAIN_FILE` (pakai script `start`), `YTDLP_COOKIES=cookies.txt`
 
 ```bash
 docker build -t ghcr.io/<username>/<repo>:node-24 ./nodejs/24
-./scripts/smoke-test.sh ghcr.io/<username>/<repo>:node-24 24
 ```
 
 ## License
