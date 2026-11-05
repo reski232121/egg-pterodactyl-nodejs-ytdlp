@@ -14,22 +14,18 @@ Image dibuild otomatis oleh GitHub Actions dan dipush ke GHCR.
 - Package manager: **npm, pnpm, yarn, bun** (dipilih lewat variabel egg)
 - TypeScript: `tsx` atau TypeScript bawaan Node (22.18+)
 - Startup modern: tini sebagai init (Stop/Restart bersih), batas heap otomatis, install dependencies hanya saat berubah, deteksi entry point otomatis
-- Dua varian image: **full** (dengan build tools) dan **slim**
 
-## Varian dan tag image
-
-| Varian | Isi | Contoh tag |
-| --- | --- | --- |
-| `full` | + gcc, make, python3-dev, dll. untuk kompilasi native module | `node-24` |
-| `slim` | tanpa build tools, lebih kecil dan lebih aman | `node-24-slim` |
+## Tag image
 
 | Tag | Mengarah ke |
 | --- | --- |
-| `node-22`, `node-24`, `node-26` | Versi major tertentu (tambahkan `-slim` untuk varian slim) |
+| `node-22`, `node-24`, `node-26` | Versi major tertentu |
 | `node-lts` | Node.js LTS pilihan repo (saat ini 24) |
 | `node-current` | Node.js terbaru (saat ini 26) |
-| `latest` / `latest-slim` | Sama dengan `node-24` / `node-24-slim` |
+| `latest` | Sama dengan `node-24` |
 | `v1.2.3-node-24` | Tag rilis Git (jika repo memakai tag `v*`) |
+
+Semua image sudah termasuk build tools (gcc, make, python3-dev, dll.) untuk kompilasi native module.
 
 Alias diatur lewat `LATEST_NODE`, `LTS_NODE`, `CURRENT_NODE` di bagian `env` workflow.
 
@@ -114,7 +110,7 @@ Catatan:
 
 ## CI/CD dan keamanan
 
-- **Smoke test** (`scripts/smoke-test.sh`) sebelum push: versi Node, yt-dlp/ffmpeg/cloudflared/pnpm/yarn/bun/tsx, curl-cffi, tunnel (token palsu: harus mencoba start dan tidak bocor ke aplikasi), build tools (full) atau tanpanya (slim), entrypoint, dan `start-app`. Image yang gagal test tidak dipush.
+- **Smoke test** (`scripts/smoke-test.sh`) sebelum push: versi Node, yt-dlp/ffmpeg/cloudflared/pnpm/yarn/bun/tsx, curl-cffi, tunnel (token palsu: harus mencoba start dan tidak bocor ke aplikasi), build tools, entrypoint, dan `start-app`. Image yang gagal test tidak dipush.
 - **Rebuild mingguan** (Senin 03:00 UTC) untuk patch Debian, Node.js, dan yt-dlp terbaru.
 - **Trivy**: laporan CVE CRITICAL/HIGH di log build (tidak memblokir).
 - **Provenance + SBOM** diaktifkan pada image yang dipush.
@@ -133,14 +129,13 @@ Catatan:
 `PACKAGE_MANAGER=pnpm`, `MAIN_FILE=src/index.ts`, `TZ=Asia/Jakarta`, `AUTO_UPDATE_YTDLP=1`, `YTDLP_CHANNEL=stable`
 
 **Media downloader (JavaScript, npm):**
-kosongkan `MAIN_FILE` (pakai script `start`), `YTDLP_COOKIES=cookies.txt`, pilih image `slim`
+kosongkan `MAIN_FILE` (pakai script `start`), `YTDLP_COOKIES=cookies.txt`
 
 ## Build manual
 
 ```bash
-docker build --build-arg VARIANT=full -t ghcr.io/<username>/<repo>:node-24 ./nodejs/24
-docker build --build-arg VARIANT=slim -t ghcr.io/<username>/<repo>:node-24-slim ./nodejs/24
-./scripts/smoke-test.sh ghcr.io/<username>/<repo>:node-24 24 full
+docker build -t ghcr.io/<username>/<repo>:node-24 ./nodejs/24
+./scripts/smoke-test.sh ghcr.io/<username>/<repo>:node-24 24
 ```
 
 ## License
