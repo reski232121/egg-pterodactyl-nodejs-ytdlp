@@ -81,7 +81,8 @@ jobs:
           cache-to: type=gha,mode=max,scope=node-${{ matrix.node }}
 
       - name: Trivy vulnerability scan (laporan, tidak memblokir)
-        uses: aquasecurity/trivy-action@0.28.0
+        # Di-pin ke commit SHA (v0.36.0). Tag lama trivy-action sempat dikompromi pada Maret 2026.
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         continue-on-error: true
         with:
           image-ref: scan:local
