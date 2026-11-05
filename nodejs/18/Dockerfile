@@ -2,27 +2,20 @@ ARG NODE_VERSION=18
 
 FROM --platform=$TARGETOS/$TARGETARCH node:${NODE_VERSION}-bookworm-slim
 
-# VARIANT=full : + build tools (gcc, make, python3-dev, dll.) untuk kompilasi native module
-# VARIANT=slim : tanpa build tools, image lebih kecil
-ARG VARIANT=full
-
 LABEL author="Ryuzetsu" maintainer="ryuzetsu342@gmail.com"
 LABEL org.opencontainers.image.source="https://github.com/reski232121/egg-pterodactyl-nodejs-ytdlp"
 LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.variant="${VARIANT}"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Termasuk build tools (gcc, make, python3-dev, dll.) untuk kompilasi native module
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
         ca-certificates curl wget git tar gzip unzip zip \
-        sqlite3 python3 python3-pip ffmpeg \
+        sqlite3 libsqlite3-dev python3 python3-pip python3-dev ffmpeg \
+        build-essential libssl-dev libffi-dev pkg-config \
         iproute2 dnsutils tzdata tini; \
-    if [ "${VARIANT}" = "full" ]; then \
-        apt-get install -y --no-install-recommends \
-            build-essential python3-dev libsqlite3-dev libssl-dev libffi-dev pkg-config; \
-    fi; \
     rm -rf /var/lib/apt/lists/*
 
 # yt-dlp[default]   : membawa yt-dlp-ejs (dibutuhkan YouTube); Node.js dipakai sebagai JS runtime
