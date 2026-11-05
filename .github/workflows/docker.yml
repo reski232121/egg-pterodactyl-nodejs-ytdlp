@@ -14,7 +14,7 @@ on:
       include_eol:
         description: 'Ikut build versi Node.js yang sudah EOL (18, 20, 21, 23, 25)'
         type: boolean
-        default: false
+        default: true
 
 concurrency:
   group: docker-${{ github.workflow }}-${{ github.ref }}
