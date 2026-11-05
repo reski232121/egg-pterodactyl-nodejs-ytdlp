@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# Smoke test image Docker. Pemakaian: scripts/smoke-test.sh <image> <node-major> <full|slim>
+# Smoke test image Docker. Pemakaian: scripts/smoke-test.sh <image> <node-major>
 set -euo pipefail
 
 image="${1:?image wajib diisi}"
 major="${2:?node major wajib diisi}"
-variant="${3:-full}"
 
 fail() { echo "::error::SMOKE TEST GAGAL: $*"; exit 1; }
 run() { docker run --rm --entrypoint bash "$image" -c "$1"; }
@@ -20,12 +19,8 @@ run 'cloudflared --version' || fail "cloudflared"
 run 'npm -v && pnpm -v && yarn -v && bun -v && tsx --version | head -n1' || fail "package manager / tsx"
 run 'yt-dlp --list-impersonate-targets | grep -qi curl_cffi' || fail "curl-cffi (impersonate) tidak aktif"
 
-echo "== varian: $variant"
-if [ "$variant" = "full" ]; then
-    run 'gcc --version | head -n1 && make --version | head -n1' || fail "build tools hilang di varian full"
-else
-    run '! command -v gcc' || fail "varian slim seharusnya tanpa gcc"
-fi
+echo "== build tools"
+run 'gcc --version | head -n1 && make --version | head -n1' || fail "build tools hilang"
 
 echo "== entrypoint + STARTUP"
 out=$(docker run --rm -e AUTO_UPDATE_YTDLP=0 -e STARTUP='echo smoke-ok' "$image")
